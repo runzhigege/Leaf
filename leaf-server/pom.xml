@@ -51,6 +51,10 @@
             <groupId>com.alibaba</groupId>
             <artifactId>druid</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.sankuai.inf.leaf</groupId>
+            <artifactId>leaf-core</artifactId>
+        </dependency>
         <!--zk-->
         <dependency>
             <groupId>org.apache.curator</groupId>

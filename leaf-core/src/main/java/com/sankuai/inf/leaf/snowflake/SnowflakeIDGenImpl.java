@@ -5,10 +5,9 @@ import com.sankuai.inf.leaf.IDGen;
 import com.sankuai.inf.leaf.common.Result;
 import com.sankuai.inf.leaf.common.Status;
 import com.sankuai.inf.leaf.common.Utils;
+import java.util.Random;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Random;
 
 public class SnowflakeIDGenImpl implements IDGen {
 
@@ -35,7 +34,8 @@ public class SnowflakeIDGenImpl implements IDGen {
 
     public SnowflakeIDGenImpl(String zkAddress, int port) {
         this.port = port;
-        SnowflakeZookeeperHolder holder = new SnowflakeZookeeperHolder(Utils.getIp(), String.valueOf(port), zkAddress);
+        SnowflakeZookeeperHolder holder = new SnowflakeZookeeperHolder(Utils.getIp(), String.valueOf(port),
+                zkAddress.concat(":").concat(String.valueOf(port)));
         initFlag = holder.init();
         if (initFlag) {
             workerId = holder.getWorkerID();
@@ -44,6 +44,19 @@ public class SnowflakeIDGenImpl implements IDGen {
             Preconditions.checkArgument(initFlag, "Snowflake Id Gen is not init ok");
         }
         Preconditions.checkArgument(workerId >= 0 && workerId <= maxWorkerId, "workerID must gte 0 and lte 1023");
+    }
+
+    public SnowflakeIDGenImpl(String akAddress, int port, String connectingString) {
+        SnowflakeZookeeperHolder holder = new SnowflakeZookeeperHolder(Utils.getIp(), String.valueOf(port),
+                connectingString);
+        initFlag = holder.init();
+        if (initFlag) {
+            workerId = holder.getWorkerID();
+            LOGGER.info("start success use zk work_id : {} ", workerId);
+        } else {
+            Preconditions.checkArgument(initFlag, "Snowflake id gen is not init ok");
+        }
+        Preconditions.checkArgument(workerId >= 0 && workerId <= maxWorkerId, "workId must gte 0 and lte 1023");
     }
 
     public synchronized Result get(String key) {
